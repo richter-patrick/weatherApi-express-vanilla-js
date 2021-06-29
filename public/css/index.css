@@ -1,0 +1,14 @@
+#zip {
+  width: 200px;
+  height: 50px;
+  margin-right: 1em;
+}
+
+#btn{
+  height: 55px;
+  color: green;
+}
+
+#btn:hover{
+  background-color: beige;
+}
