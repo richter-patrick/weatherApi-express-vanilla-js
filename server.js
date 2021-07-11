@@ -12,7 +12,7 @@ const cors = require('cors');
 app.use(cors());
 
 //Hold Data
-let projectData = [];
+let projectData = {};
 
 const apiKey = '81dd8cc551fcd06439eb103f1b136e79';
 //serve html
@@ -25,11 +25,14 @@ app.get('/', (req,res) => {
 
 
 app.post('/add', function(req,res){
-  projectData.push(req.body)
-  res.json({ transformed: projectData});
-  projectData = [];
+  projectData=req.body;
+  res.json(projectData);
 })
 
 app.listen(port, () => {
   console.log(`Running on Port: ${port}`);
 })
+
+app.get('/all', function(req, res){
+  res.json(projectData);
+  })

@@ -24,23 +24,20 @@ async function getWeatherData() {
   try {
     const response = await fetch(weatherUrl);
     const data = await response.json();
-      generatedData = {
-        temp: data.main.temp,
-        date: data.dt,
-        userResponse: zip.value
+    generatedData = {
+      temp: data.main.temp,
+      date: data.dt,
+      userResponse: zip.value
     }
-  }
-  catch (error) {
+  await postDataToBackend(generatedData)
+    .then(() => getData('/all'))
+    .then((data) => console.log('hi',data),updateUiAfterDataReceivedFromBackend(data))
+  }  catch (error) {
     console.log('Error happened', error);
-  }
-  finally {
-    postDataToBackend(generatedData);
   }
 }
 
 async function postDataToBackend(data) {
-  //New Post request
-
   const response = await fetch('/add', {
     method: 'POST',
     credentials: 'same-origin',
@@ -49,7 +46,6 @@ async function postDataToBackend(data) {
     },
     body: JSON.stringify(data),
   })
-
   try {
     backendData = await response.clone().json();
   } catch (error) {
@@ -60,31 +56,26 @@ async function postDataToBackend(data) {
   }
 }
 
-//update shall retrieve data from our server/app? 
-//select necessary parts in dom and update ui for
-// - Temperature
-// - Date
-// - User input
 async function updateUiAfterDataReceivedFromBackend(data) {
-  const backendTemp = data.transformed[0].temp;
-  const backendDate = data.transformed[0].date;
-  const backendUserResponseZip = data.transformed[0].userResponse;
+  const backendTemp = data.temp;
+  const backendDate = data.date;
+  const backendUserResponseZip = data.userResponse;
 
-  if(data) {
+  if (data) {
     document.getElementById("userResponseData").style.display = "block";
-    setTimeout(function(){
+    setTimeout(function () {
       document.getElementById('transformZip').innerHTML = backendUserResponseZip;
-    },1000)
-    
-    setTimeout(function() {
+    }, 1000)
+
+    setTimeout(function () {
       document.getElementById("transformDate").innerHTML = backendDate;
-    },1500)
-    setTimeout(function() {
+    }, 1500)
+    setTimeout(function () {
       document.getElementById("tranformTemp").innerHTML = `${backendTemp}&deg;`;
       applyFeelings(backendTemp);
-    },2000)
+    }, 2000)
   }
-  
+
 }
 
 const getData = async (url) => {
@@ -100,11 +91,11 @@ const getData = async (url) => {
 
 const applyFeelings = (data) => {
   const textArea = document.getElementById("feelings");
-  if(data > 20) {
+  if (data > 20) {
     return textArea.innerHTML = '🥵';
-  } else if ( data < 20) {
+  } else if (data < 20) {
     return textArea.innerHTML = '😃';
-  } else if (data < 10){
+  } else if (data < 10) {
     return textArea.innerHTML = '🥶';
   }
 
