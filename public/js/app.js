@@ -12,7 +12,7 @@ let userResponse = '';
 
 // Using Async in favor of chained promises
 // https://blog.devgenius.io/how-do-differences-in-promise-chains-and-async-await-affect-your-code-logic-b85aeb566ebb
-async function postData(url, data = []) {
+async function postData(url = '', data = []) {
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'same-origin',
@@ -40,10 +40,9 @@ document.getElementById("btnSendDataToBackend").addEventListener("click", getWea
 
 async function getWeatherData() {
   // const getWeatherData = async() => {
-
-     zip = document.getElementById("zip");
-     zipValue = zip.value;
-    weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${zipValue}&appid=${apiKey}`
+  zip = document.getElementById("zip");
+  zipValue = zip.value;
+  weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${zipValue}&appid=${apiKey}`
   console.log(weatherUrl);
   console.log(zip);
   console.log(zipValue);
@@ -64,18 +63,21 @@ async function getWeatherData() {
   }
 }
 
-async function anotherAsyncFun(url = '/newPost', data = { temp, date, userResponse }) {
-
+async function anotherAsyncFun(url = '/add', data = { temp, date, userResponse }) {
   //New Post request
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(temp, date, userResponse),
+  });
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(temp, date, userResponse),
-    });
+    const newData = await response.json();
+    console.log(newData);
+    return newData;
   } catch (error) {
     console.log('Error hapened', error);
   }
@@ -103,9 +105,6 @@ function generateData(e) {
   getData(url)
 }
 
-
-
-
 const getData = async (url) => {
   console.log('hallo');
   const res = await fetch(url)
@@ -117,10 +116,3 @@ const getData = async (url) => {
     console.log("getData error, ", error);
   }
 }
-
-
-postData('/add', { answer: '28' })
-postData('/add', { question: '?' })
-
-
-
