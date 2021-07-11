@@ -26,12 +26,10 @@ app.get('/', (req,res) => {
 
 app.post('/add', function(req,res){
   projectData.push(req.body)
-  console.log('pjd',projectData)
   res.json({ transformed: projectData});
   projectData = [];
 })
 
 app.listen(port, () => {
   console.log(`Running on Port: ${port}`);
-  
 })

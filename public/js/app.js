@@ -3,6 +3,7 @@ const apiKey = '81dd8cc551fcd06439eb103f1b136e79';
 let zip = null;
 let zipValue = null;
 let weatherUrl = null;
+let backendData = null;
 
 
 //Data that will be initialized later and 
@@ -17,14 +18,9 @@ document.getElementById("btnSendDataToBackend").addEventListener("click", getWea
 
 async function getWeatherData() {
   cleanup();
-
-  // triggerHideAndSeek;
-  // const getWeatherData = async() => {
   zip = document.getElementById("zip");
   zipValue = zip.value;
   weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${zipValue}&appid=${apiKey}&units=metric`
-  console.log(weatherUrl);
-  console.log(zipValue);
   try {
     const response = await fetch(weatherUrl);
     const data = await response.json();
@@ -33,7 +29,6 @@ async function getWeatherData() {
         date: data.dt,
         userResponse: zip.value
     }
-    console.log('getWeatherData', data);
   }
   catch (error) {
     console.log('Error happened', error);
@@ -45,7 +40,7 @@ async function getWeatherData() {
 
 async function postDataToBackend(data) {
   //New Post request
-  backendData = null;
+
   const response = await fetch('/add', {
     method: 'POST',
     credentials: 'same-origin',
@@ -54,11 +49,9 @@ async function postDataToBackend(data) {
     },
     body: JSON.stringify(data),
   })
-  backendData = await response.clone().json();
+
   try {
-    const newData = await response.json();
-    // console.log('assd',newData);
-    return newData;
+    backendData = await response.clone().json();
   } catch (error) {
     console.log('Error hapened', error);
   }
@@ -88,6 +81,7 @@ async function updateUiAfterDataReceivedFromBackend(data) {
     },1500)
     setTimeout(function() {
       document.getElementById("tranformTemp").innerHTML = `${backendTemp}&deg;`;
+      applyFeelings(backendTemp);
     },2000)
   }
   
@@ -104,6 +98,17 @@ const getData = async (url) => {
   }
 }
 
+const applyFeelings = (data) => {
+  const textArea = document.getElementById("feelings");
+  if(data > 20) {
+    return textArea.innerHTML = '🥵';
+  } else if ( data < 20) {
+    return textArea.innerHTML = '😃';
+  } else if (data < 10){
+    return textArea.innerHTML = '🥶';
+  }
+
+}
 
 //helper method
 const cleanup = () => {
