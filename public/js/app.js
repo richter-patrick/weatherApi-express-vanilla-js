@@ -4,6 +4,7 @@ let zip = null;
 let zipValue = null;
 let weatherUrl = null;
 
+
 //Data that will be initialized later and 
 //and send with the post request
 let temp = '';
@@ -12,81 +13,58 @@ let userResponse = '';
 
 // Using Async in favor of chained promises
 // https://blog.devgenius.io/how-do-differences-in-promise-chains-and-async-await-affect-your-code-logic-b85aeb566ebb
-async function postData(url = '', data = []) {
-  const response = await fetch(url, {
-    method: 'POST',
-    credentials: 'same-origin',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  try {
-    const newData = await response.json();
-    console.log('from try', newData);
-    return newData;
-  }
-  catch (error) {
-    console.log('error', error);
-  }
-  zip.value = "";
-}
-
-
-
-// document.getElementById("btnSendDataToBackend").addEventListener("click", postData);
 document.getElementById("btnSendDataToBackend").addEventListener("click", getWeatherData);
 
 async function getWeatherData() {
+  cleanup();
+
+  // triggerHideAndSeek;
   // const getWeatherData = async() => {
   zip = document.getElementById("zip");
   zipValue = zip.value;
-  weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${zipValue}&appid=${apiKey}`
+  weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${zipValue}&appid=${apiKey}&units=metric`
   console.log(weatherUrl);
-  console.log(zip);
   console.log(zipValue);
   try {
     const response = await fetch(weatherUrl);
     const data = await response.json();
-    // return movies;
-    temp = data.main.temp;
-    date = data.dt;
-    userResponse = zipValue;
+      generatedData = {
+        temp: data.main.temp,
+        date: data.dt,
+        userResponse: zip.value
+    }
     console.log('getWeatherData', data);
   }
   catch (error) {
     console.log('Error happened', error);
   }
   finally {
-    anotherAsyncFun();
+    postDataToBackend(generatedData);
   }
 }
 
-async function anotherAsyncFun(url = '/add', data = { temp, date, userResponse }) {
+async function postDataToBackend(data) {
   //New Post request
-
-  const response = await fetch(url, {
+  backendData = null;
+  const response = await fetch('/add', {
     method: 'POST',
     credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(temp, date, userResponse),
-  });
+    body: JSON.stringify(data),
+  })
+  backendData = await response.clone().json();
   try {
     const newData = await response.json();
-    console.log(newData);
+    // console.log('assd',newData);
     return newData;
   } catch (error) {
     console.log('Error hapened', error);
   }
   finally {
-    updateUi();
-
+    updateUiAfterDataReceivedFromBackend(backendData);
   }
-  //After data is successfully send back,
-  //call method to update ui
 }
 
 //update shall retrieve data from our server/app? 
@@ -94,19 +72,28 @@ async function anotherAsyncFun(url = '/add', data = { temp, date, userResponse }
 // - Temperature
 // - Date
 // - User input
-async function updateUi() {
+async function updateUiAfterDataReceivedFromBackend(data) {
+  const backendTemp = data.transformed[0].temp;
+  const backendDate = data.transformed[0].date;
+  const backendUserResponseZip = data.transformed[0].userResponse;
 
-}
-
-document.getElementById("btnGenerate").addEventListener("click", generateData)
-
-//TODO - Add handlers 
-function generateData(e) {
-  getData(url)
+  if(data) {
+    document.getElementById("userResponseData").style.display = "block";
+    setTimeout(function(){
+      document.getElementById('transformZip').innerHTML = backendUserResponseZip;
+    },1000)
+    
+    setTimeout(function() {
+      document.getElementById("transformDate").innerHTML = backendDate;
+    },1500)
+    setTimeout(function() {
+      document.getElementById("tranformTemp").innerHTML = `${backendTemp}&deg;`;
+    },2000)
+  }
+  
 }
 
 const getData = async (url) => {
-  console.log('hallo');
   const res = await fetch(url)
   try {
     const data = await res.json();
@@ -115,4 +102,12 @@ const getData = async (url) => {
   } catch (error) {
     console.log("getData error, ", error);
   }
+}
+
+
+//helper method
+const cleanup = () => {
+  document.getElementById('transformZip').innerHTML = '???';
+  document.getElementById('transformDate').innerHTML = '???';
+  document.getElementById('tranformTemp').innerHTML = '???';
 }
