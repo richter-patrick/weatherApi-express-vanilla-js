@@ -9,7 +9,8 @@ let backendData = null;
 //Data that will be initialized later and 
 //and send with the post request
 let temp = '';
-let date = '';
+const newDate = new Date();
+let  newDateFormatted = `${newDate.getMonth()+1} - ${newDate.getDate()} - ${newDate.getFullYear()}`
 let userResponse = '';
 
 // Using Async in favor of chained promises
@@ -26,12 +27,12 @@ async function getWeatherData() {
     const data = await response.json();
     generatedData = {
       temp: data.main.temp,
-      date: data.dt,
+      date: newDateFormatted,
       userResponse: zip.value
     }
   await postDataToBackend(generatedData)
     .then(() => getData('/all'))
-    .then((data) => console.log('hi',data),updateUiAfterDataReceivedFromBackend(data))
+    .then((data) => updateUiAfterDataReceivedFromBackend(data))
   }  catch (error) {
     console.log('Error happened', error);
   }
@@ -58,7 +59,6 @@ async function postDataToBackend(data) {
 
 async function updateUiAfterDataReceivedFromBackend(data) {
   const backendTemp = data.temp;
-  const backendDate = data.date;
   const backendUserResponseZip = data.userResponse;
 
   if (data) {
@@ -68,7 +68,7 @@ async function updateUiAfterDataReceivedFromBackend(data) {
     }, 1000)
 
     setTimeout(function () {
-      document.getElementById("transformDate").innerHTML = backendDate;
+      document.getElementById("transformDate").innerHTML = newDateFormatted;
     }, 1500)
     setTimeout(function () {
       document.getElementById("tranformTemp").innerHTML = `${backendTemp}&deg;`;
