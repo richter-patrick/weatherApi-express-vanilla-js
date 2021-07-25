@@ -90,6 +90,19 @@ const getData = async (url) => {
   }
 }
 
+const displayUI = async() => {
+  const request = await fetch("/data");
+  try {
+    const data = await request.json()
+    document.getElementById('content').innerHTML = "you feel like" + data.feelings;
+    document.getElementById('temp').innerHTML = "the temp is" + data.temperature;
+    document.getElementById('date').innerHTML = "the date is" + data.newDate;
+  } catch(error){
+    console.log("error", error);
+  }
+};
+
+
 const applyFeelings = (data) => {
   const textArea = document.getElementById("feelings");
   if (data > 20) {
