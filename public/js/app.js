@@ -21,7 +21,6 @@ async function getWeatherData() {
   cleanup();
   zip = document.getElementById("zip");
   zipValue = zip.value;
-  feelings = document.getElementById("feelings");
   weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${zipValue}&appid=${apiKey}&units=metric`
   try {
     const response = await fetch(weatherUrl);
@@ -29,7 +28,7 @@ async function getWeatherData() {
     generatedData = {
       temp: data.main.temp,
       date: newDateFormatted,
-      userResponse: feelings.value,
+      userResponse: zip.value
     }
   await postDataToBackend(generatedData)
     .then(() => getData('/all'))
@@ -60,7 +59,7 @@ async function postDataToBackend(data) {
 
 async function updateUiAfterDataReceivedFromBackend(data) {
   const backendTemp = data.temp;
-    const backendUserResponseZip = data.userResponse;
+  const backendUserResponseZip = data.userResponse;
 
   if (data) {
     document.getElementById("userResponseData").style.display = "block";
@@ -83,25 +82,11 @@ const getData = async (url) => {
   const res = await fetch(url)
   try {
     const data = await res.json();
-    console.log('getData function', data);
     return data;
   } catch (error) {
     console.log("getData error, ", error);
   }
 }
-
-const displayUI = async() => {
-  const request = await fetch("/data");
-  try {
-    const data = await request.json()
-    document.getElementById('content').innerHTML = "you feel like" + data.feelings;
-    document.getElementById('temp').innerHTML = "the temp is" + data.temperature;
-    document.getElementById('date').innerHTML = "the date is" + data.newDate;
-  } catch(error){
-    console.log("error", error);
-  }
-};
-
 
 const applyFeelings = (data) => {
   const textArea = document.getElementById("feelings");
