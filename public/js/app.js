@@ -21,6 +21,7 @@ async function getWeatherData() {
   cleanup();
   zip = document.getElementById("zip");
   zipValue = zip.value;
+  feelings = document.getElementById("feelings");
   weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${zipValue}&appid=${apiKey}&units=metric`
   try {
     const response = await fetch(weatherUrl);
@@ -28,7 +29,7 @@ async function getWeatherData() {
     generatedData = {
       temp: data.main.temp,
       date: newDateFormatted,
-      userResponse: zip.value
+      userResponse: feelings.value,
     }
   await postDataToBackend(generatedData)
     .then(() => getData('/all'))
@@ -59,7 +60,7 @@ async function postDataToBackend(data) {
 
 async function updateUiAfterDataReceivedFromBackend(data) {
   const backendTemp = data.temp;
-  const backendUserResponseZip = data.userResponse;
+    const backendUserResponseZip = data.userResponse;
 
   if (data) {
     document.getElementById("userResponseData").style.display = "block";
